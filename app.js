@@ -54,16 +54,6 @@ const ortofotoRocha = L.tileLayer.wms(
     }
 );
 
-const parcelasWMS = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:parcelas_mobile',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
 
 const manzanasLimite = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
