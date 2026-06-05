@@ -80,6 +80,7 @@ const manzanasWMS = L.tileLayer.wms(
 ortofotoRocha.addTo(map);
 parcelasWMS.addTo(map);
 manzanasWMS.addTo(map);
+manzanasWMS.bringToFront();
 
 // ======================
 // FEATURE GROUP
