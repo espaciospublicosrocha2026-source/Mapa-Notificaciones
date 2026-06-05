@@ -65,6 +65,17 @@ const parcelasWMS = L.tileLayer.wms(
     }
 );
 
+const manzanasLimite = L.tileLayer.wms(
+    'https://sig.rocha.gub.uy/geoserver226/wms',
+    {
+        layers:'sigRocha:v_fr_manzanas',
+        format:'image/png',
+        transparent:true,
+        version:'1.1.1',
+        maxZoom:22
+    }
+);
+
 const manzanasWMS = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
@@ -79,6 +90,7 @@ const manzanasWMS = L.tileLayer.wms(
 
 ortofotoRocha.addTo(map);
 parcelasWMS.addTo(map);
+manzanasLimite.addTo(map);
 manzanasWMS.addTo(map);
 manzanasWMS.bringToFront();
 
