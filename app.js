@@ -57,7 +57,7 @@ const ortofotoRocha = L.tileLayer.wms(
 const parcelas = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers:'sigRocha:v_parcelario_urbano',
+        layers:'sigRocha:parcelas_mobile',
         format:'image/png',
         transparent:true,
         version:'1.1.1',
