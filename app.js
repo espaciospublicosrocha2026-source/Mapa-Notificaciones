@@ -65,8 +65,21 @@ const parcelasWMS = L.tileLayer.wms(
     }
 );
 
+const manzanasWMS = L.tileLayer.wms(
+    'https://sig.rocha.gub.uy/geoserver226/wms',
+    {
+        layers:'sigRocha:v_fr_manzanas_rocha',
+        format:'image/png',
+        transparent:true,
+        version:'1.1.1',
+        maxZoom:22
+    }
+);
+
+
 ortofotoRocha.addTo(map);
 parcelasWMS.addTo(map);
+manzanasWMS.addTo(map);
 
 // ======================
 // FEATURE GROUP
