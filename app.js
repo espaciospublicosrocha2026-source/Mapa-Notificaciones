@@ -43,13 +43,17 @@ map = L.map('mapa').setView(
 // CAPAS BASE
 // ======================
 
-const mapa = L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+const googleSatellite = L.tileLayer.wms(
+    'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        subdomains: 'abcd',
-        maxZoom: 20
+        layers: 'GoogleSatellite',
+        format: 'image/png',
+        transparent: false,
+        version: '1.1.1',
+        maxZoom: 22
     }
 );
+
 
 const parcelas = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
@@ -95,7 +99,7 @@ const manzanasWMS = L.tileLayer.wms(
     }
 );
 
-mapa.addTo(map);
+googleSatellite.addTo(map);
 
 parcelas.addTo(map);
 calles.addTo(map);
