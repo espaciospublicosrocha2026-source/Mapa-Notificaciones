@@ -67,8 +67,6 @@ function activarEliminar(){
 
 }
 
-}
-
 // HACER GLOBALES
 
 window.setColor = setColor;
