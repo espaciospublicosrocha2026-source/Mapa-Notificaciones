@@ -27,9 +27,7 @@ href="estilos.css">
 
 <div id="panel">
 
-    <h3>
-        Herramientas
-    </h3>
+    <h3>Herramientas</h3>
 
     <button onclick="setColor('red')">
         Rojo
@@ -44,8 +42,25 @@ href="estilos.css">
     </button>
 
     <button onclick="limpiarDibujos()">
-        Limpiar
+        Limpiar dibujos
     </button>
+
+    <hr>
+
+    <button onclick="activarContador()">
+        Contar parcelas
+    </button>
+
+    <button onclick="limpiarContador()">
+        Reiniciar contador
+    </button>
+
+    <div style="margin-top:10px;">
+        Parcelas contadas:
+        <strong><span id="contadorParcelas">0</span></strong>
+    </div>
+
+    <hr>
 
     <div id="colorActual">
         Color actual: red
