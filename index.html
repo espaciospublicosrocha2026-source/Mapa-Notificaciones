@@ -51,13 +51,19 @@ href="estilos.css">
         Contar parcelas
     </button>
 
+    <button onclick="activarEliminar()">
+        Eliminar punto
+    </button>
+
     <button onclick="limpiarContador()">
         Reiniciar contador
     </button>
 
     <div style="margin-top:10px;">
         Parcelas contadas:
-        <strong><span id="contadorParcelas">0</span></strong>
+        <strong>
+            <span id="contadorParcelas">0</span>
+        </strong>
     </div>
 
     <hr>
@@ -68,11 +74,13 @@ href="estilos.css">
 
 </div>
 
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
 
 <script src="app.js"></script>
+
 
 </body>
 
