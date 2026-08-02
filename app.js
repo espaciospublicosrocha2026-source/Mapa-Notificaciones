@@ -165,7 +165,7 @@ map.on(L.Draw.Event.CREATED,function(e){
 
         color: currentColor,
         fillColor: currentColor,
-        fillOpacity:0.5,
+        fillOpacity:0,
         weight:3
 
     });
