@@ -383,3 +383,4 @@ fetch('https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j
     );
 
 });
+console.log("APP TERMINO DE CARGAR");
