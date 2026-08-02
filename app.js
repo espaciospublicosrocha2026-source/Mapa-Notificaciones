@@ -229,38 +229,74 @@ map.on(L.Draw.Event.DELETED,function(){
 
 });
 
-const punto = L.circleMarker(e.latlng,{
-    radius:15,
-    stroke:true,
-    color:"#000000",
-    weight:3,
-    opacity:1,
-    fill:true,
-    fillColor:"#000000",
-    fillOpacity:1
+map.on("click", function(e){
+
+
+    // ======================
+    // ELIMINAR PUNTO
+    // ======================
+
+    if(modoEliminar){
+
+        let eliminado = false;
+
+        puntosContador.eachLayer(function(layer){
+
+            let distancia = map.distance(
+                e.latlng,
+                layer.getLatLng()
+            );
+
+            // distancia en metros
+            if(distancia < 20 && !eliminado){
+
+                puntosContador.removeLayer(layer);
+
+                contador--;
+
+                document.getElementById(
+                    "contadorParcelas"
+                ).innerHTML = contador;
+
+                eliminado = true;
+            }
+
+        });
+
+        return;
+
+    }
+
+
+
+    // ======================
+    // CREAR PUNTO
+    // ======================
+
+    if(!modoContador) return;
+
+
+    const punto = L.circleMarker(e.latlng,{
+        radius:15,
+        stroke:true,
+        color:"#000000",
+        weight:3,
+        fillColor:"#000000",
+        fillOpacity:1
+    });
+
+
+    punto.addTo(puntosContador);
+
+
+    contador++;
+
+    document.getElementById(
+        "contadorParcelas"
+    ).innerHTML = contador;
+
+
 });
-
-
-punto.on("click",function(event){
-
-    L.DomEvent.stopPropagation(event);
-
-    if(!modoEliminar) return;
-
-    puntosContador.removeLayer(punto);
-
-    contador--;
-
-    document.getElementById("contadorParcelas").innerHTML = contador;
-
-});
-
-
-punto.addTo(puntosContador);
-
-contador++;
-
-document.getElementById("contadorParcelas").innerHTML = contador;
 // ======================
 // GUARDAR EN GOOGLE DRIVE
 // ======================
