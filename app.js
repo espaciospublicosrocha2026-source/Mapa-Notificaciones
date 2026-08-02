@@ -90,22 +90,26 @@ map = L.map('mapa').setView(
 // CAPAS BASE
 // ======================
 
-const googleSatellite = L.tileLayer.wms(
+// ORTOFOTO URBANA (FONDO)
+
+const ortofotoUrbana = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers: 'GoogleSatellite',
-        format: 'image/png',
-        transparent: false,
-        version: '1.1.1',
-        maxZoom: 22
+        layers:'sigRocha:ortofoto_urbana',
+        format:'image/png',
+        transparent:false,
+        version:'1.1.1',
+        maxZoom:22
     }
 );
 
 
-const parcelas = L.tileLayer.wms(
+// CATASTRO / PARCELAS (ENCIMA)
+
+const catastroParcelas = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers:'sigRocha:parcelas_mobile',
+        layers:'sigRocha:cat_parcelario_urbano_buscar',
         format:'image/png',
         transparent:true,
         version:'1.1.1',
@@ -113,46 +117,18 @@ const parcelas = L.tileLayer.wms(
     }
 );
 
-const calles = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:v_nombres_calles',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
 
-const manzanasLimite = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:v_fr_manzanas',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
+// ======================
+// AGREGAR CAPAS AL MAPA
+// ======================
 
-const manzanasWMS = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:v_fr_manzanas_rocha',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
+// Fondo
+ortofotoUrbana.addTo(map);
 
-googleSatellite.addTo(map);
+// Bordes de parcelas
+catastroParcelas.addTo(map);
 
-parcelas.addTo(map);
-calles.addTo(map);
-manzanasLimite.addTo(map);
-manzanasWMS.addTo(map);
-manzanasWMS.bringToFront();
+catastroParcelas.bringToFront();
 
 puntosContador = L.layerGroup().addTo(map);
 // ======================
