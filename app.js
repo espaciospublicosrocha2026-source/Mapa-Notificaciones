@@ -55,11 +55,17 @@ function activarEliminar(){
 
     modoEliminar = !modoEliminar;
 
+    if(modoEliminar){
+        modoContador = false;
+    }
+
     alert(
         modoEliminar
         ? "Modo eliminar activado"
         : "Modo eliminar desactivado"
     );
+
+}
 
 }
 
