@@ -88,22 +88,22 @@ map = L.map('mapa').setView(
 // CAPAS BASE
 // ======================
 
-const googleSatellite = L.tileLayer.wms(
+const ortofotoUrbana = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers: 'GoogleSatellite',
-        format: 'image/png',
-        transparent: false,
-        version: '1.1.1',
-        maxZoom: 22
+        layers:'sigRocha:ortofoto_urbana',
+        format:'image/png',
+        transparent:false,
+        version:'1.1.1',
+        maxZoom:22
     }
 );
 
 
-const parcelas = L.tileLayer.wms(
+const catastroParcelas = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers:'sigRocha:parcelas_mobile',
+        layers:'sigRocha:cat_parcelario_urbano_buscar',
         format:'image/png',
         transparent:true,
         version:'1.1.1',
@@ -111,46 +111,14 @@ const parcelas = L.tileLayer.wms(
     }
 );
 
-const calles = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:v_nombres_calles',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
 
-const manzanasLimite = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:v_fr_manzanas',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
+// ======================
+// CARGAR CAPAS
+// ======================
 
-const manzanasWMS = L.tileLayer.wms(
-    'https://sig.rocha.gub.uy/geoserver226/wms',
-    {
-        layers:'sigRocha:v_fr_manzanas_rocha',
-        format:'image/png',
-        transparent:true,
-        version:'1.1.1',
-        maxZoom:22
-    }
-);
+ortofotoUrbana.addTo(map);
 
-googleSatellite.addTo(map);
-
-parcelas.addTo(map);
-calles.addTo(map);
-manzanasLimite.addTo(map);
-manzanasWMS.addTo(map);
-manzanasWMS.bringToFront();
+catastroParcelas.addTo(map);
 
 puntosContador = L.layerGroup().addTo(map);
 // ======================
@@ -414,3 +382,4 @@ fetch('https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j
         error
     );
 
+});
