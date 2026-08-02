@@ -1,6 +1,9 @@
 let map;
 let drawnItems;
 let currentColor = 'red';
+let modoContador = false;
+let contador = 0;
+let puntosContador;
 
 // ======================
 // FUNCIONES GLOBALES
@@ -22,6 +25,28 @@ function limpiarDibujos(){
     drawnItems.clearLayers();
 
     guardarGeoJSON();
+
+}
+
+function activarContador(){
+
+    modoContador = !modoContador;
+
+    alert(
+        modoContador
+        ? "Modo contador activado"
+        : "Modo contador desactivado"
+    );
+
+}
+
+function limpiarContador(){
+
+    puntosContador.clearLayers();
+
+    contador = 0;
+
+    document.getElementById("contadorParcelas").innerHTML = contador;
 
 }
 
@@ -107,6 +132,7 @@ manzanasLimite.addTo(map);
 manzanasWMS.addTo(map);
 manzanasWMS.bringToFront();
 
+puntosContador = L.layerGroup().addTo(map);
 // ======================
 // FEATURE GROUP
 // ======================
@@ -184,6 +210,23 @@ map.on(L.Draw.Event.EDITED,function(){
 map.on(L.Draw.Event.DELETED,function(){
 
     guardarGeoJSON();
+
+});
+
+map.on("click", function(e){
+
+    if(!modoContador) return;
+
+    L.circleMarker(e.latlng,{
+        radius:5,
+        color:"yellow",
+        fillColor:"yellow",
+        fillOpacity:1
+    }).addTo(puntosContador);
+
+    contador++;
+
+    document.getElementById("contadorParcelas").innerHTML = contador;
 
 });
 
