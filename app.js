@@ -218,7 +218,7 @@ map.on("click", function(e){
     if(!modoContador) return;
 
     L.circleMarker(e.latlng,{
-        radius:5,
+        radius:15,
         color:"black",
         fillColor:"black",
         fillOpacity:1
