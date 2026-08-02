@@ -67,7 +67,6 @@ function activarEliminar(){
 
 }
 
-}
 
 // HACER GLOBALES
 
