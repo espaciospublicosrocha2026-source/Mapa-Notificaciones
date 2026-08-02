@@ -216,13 +216,17 @@ map.on(L.Draw.Event.DELETED,function(){
 map.on("click", function(e){
 
     if(!modoContador) return;
-
-    L.circleMarker(e.latlng,{
-        radius:15,
-        color:"black",
-        fillColor:"black",
-        fillOpacity:1
-    }).addTo(puntosContador);
+    
+L.circleMarker(e.latlng,{
+    radius:15,
+    stroke:true,
+    color:"#000000",
+    weight:3,
+    opacity:1,
+    fill:true,
+    fillColor:"#000000",
+    fillOpacity:1
+}).addTo(puntosContador);
 
     contador++;
 
