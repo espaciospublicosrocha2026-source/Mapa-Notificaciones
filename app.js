@@ -67,6 +67,9 @@ function activarEliminar(){
 
 window.setColor = setColor;
 window.limpiarDibujos = limpiarDibujos;
+window.activarContador = activarContador;
+window.limpiarContador = limpiarContador;
+window.activarEliminar = activarEliminar;
 
 // ======================
 // INICIAR MAPA
@@ -229,30 +232,32 @@ map.on(L.Draw.Event.DELETED,function(){
 map.on("click", function(e){
 
     if(!modoContador) return;
-    
-L.circleMarker(e.latlng,{
-    radius:15,
-    stroke:true,
-    color:"#000000",
-    weight:3,
-    opacity:1,
-    fill:true,
-    fillColor:"#000000",
-    fillOpacity:1
-});
-    punto.on("click",function(){
 
-    if(!modoEliminar) return;
+    const punto = L.circleMarker(e.latlng,{
+        radius:15,
+        stroke:true,
+        color:"#000000",
+        weight:3,
+        opacity:1,
+        fill:true,
+        fillColor:"#000000",
+        fillOpacity:1
+    });
 
-    puntosContador.removeLayer(punto);
+    punto.on("click", function(){
 
-    contador--;
+        if(!modoEliminar) return;
 
-    document.getElementById("contadorParcelas").innerHTML = contador;
+        puntosContador.removeLayer(punto);
 
-});
+        contador--;
 
-punto.addTo(puntosContador);
+        document.getElementById("contadorParcelas").innerHTML = contador;
+
+    });
+
+    punto.addTo(puntosContador);
+
     contador++;
 
     document.getElementById("contadorParcelas").innerHTML = contador;
