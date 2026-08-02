@@ -229,41 +229,38 @@ map.on(L.Draw.Event.DELETED,function(){
 
 });
 
-map.on("click", function(e){
+const punto = L.circleMarker(e.latlng,{
+    radius:15,
+    stroke:true,
+    color:"#000000",
+    weight:3,
+    opacity:1,
+    fill:true,
+    fillColor:"#000000",
+    fillOpacity:1
+});
 
-    if(!modoContador) return;
 
-    const punto = L.circleMarker(e.latlng,{
-        radius:15,
-        stroke:true,
-        color:"#000000",
-        weight:3,
-        opacity:1,
-        fill:true,
-        fillColor:"#000000",
-        fillOpacity:1
-    });
+punto.on("click",function(event){
 
-    punto.on("click", function(){
+    L.DomEvent.stopPropagation(event);
 
-        if(!modoEliminar) return;
+    if(!modoEliminar) return;
 
-        puntosContador.removeLayer(punto);
+    puntosContador.removeLayer(punto);
 
-        contador--;
-
-        document.getElementById("contadorParcelas").innerHTML = contador;
-
-    });
-
-    punto.addTo(puntosContador);
-
-    contador++;
+    contador--;
 
     document.getElementById("contadorParcelas").innerHTML = contador;
 
 });
 
+
+punto.addTo(puntosContador);
+
+contador++;
+
+document.getElementById("contadorParcelas").innerHTML = contador;
 // ======================
 // GUARDAR EN GOOGLE DRIVE
 // ======================
