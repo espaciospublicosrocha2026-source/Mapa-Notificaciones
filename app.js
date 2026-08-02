@@ -121,7 +121,7 @@ const catastroParcelas = L.tileLayer.wms(
 ortofotoUrbana.addTo(map);
 
 // Parcelas arriba del fondo
-catastroParcelas.addTo(map);
+//catastroParcelas.addTo(map);
 
 puntosContador = L.layerGroup().addTo(map);
 // ======================
