@@ -117,17 +117,11 @@ const catastroParcelas = L.tileLayer.wms(
 );
 
 
-// ======================
-// AGREGAR CAPAS AL MAPA
-// ======================
-
 // Fondo
 ortofotoUrbana.addTo(map);
 
-// Bordes de parcelas
+// Parcelas arriba del fondo
 catastroParcelas.addTo(map);
-
-catastroParcelas.bringToFront();
 
 puntosContador = L.layerGroup().addTo(map);
 // ======================
