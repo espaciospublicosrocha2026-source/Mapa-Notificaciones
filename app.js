@@ -67,6 +67,7 @@ function activarEliminar(){
 
 }
 
+}
 
 // HACER GLOBALES
 
@@ -89,26 +90,22 @@ map = L.map('mapa').setView(
 // CAPAS BASE
 // ======================
 
-// ORTOFOTO URBANA (FONDO)
-
-const ortofotoUrbana = L.tileLayer.wms(
+const googleSatellite = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers:'sigRocha:ortofoto_urbana',
-        format:'image/png',
-        transparent:false,
-        version:'1.1.1',
-        crs:L.CRS.EPSG4326,
-        maxZoom:22
+        layers: 'GoogleSatellite',
+        format: 'image/png',
+        transparent: false,
+        version: '1.1.1',
+        maxZoom: 22
     }
 );
 
-// CATASTRO / PARCELAS (ENCIMA)
 
-const catastroParcelas = L.tileLayer.wms(
+const parcelas = L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers:'sigRocha:cat_parcelario_urbano_buscar',
+        layers:'sigRocha:parcelas_mobile',
         format:'image/png',
         transparent:true,
         version:'1.1.1',
@@ -116,12 +113,46 @@ const catastroParcelas = L.tileLayer.wms(
     }
 );
 
+const calles = L.tileLayer.wms(
+    'https://sig.rocha.gub.uy/geoserver226/wms',
+    {
+        layers:'sigRocha:v_nombres_calles',
+        format:'image/png',
+        transparent:true,
+        version:'1.1.1',
+        maxZoom:22
+    }
+);
 
-// Fondo
-ortofotoUrbana.addTo(map);
+const manzanasLimite = L.tileLayer.wms(
+    'https://sig.rocha.gub.uy/geoserver226/wms',
+    {
+        layers:'sigRocha:v_fr_manzanas',
+        format:'image/png',
+        transparent:true,
+        version:'1.1.1',
+        maxZoom:22
+    }
+);
 
-// Parcelas arriba del fondo
-//catastroParcelas.addTo(map);
+const manzanasWMS = L.tileLayer.wms(
+    'https://sig.rocha.gub.uy/geoserver226/wms',
+    {
+        layers:'sigRocha:v_fr_manzanas_rocha',
+        format:'image/png',
+        transparent:true,
+        version:'1.1.1',
+        maxZoom:22
+    }
+);
+
+googleSatellite.addTo(map);
+
+parcelas.addTo(map);
+calles.addTo(map);
+manzanasLimite.addTo(map);
+manzanasWMS.addTo(map);
+manzanasWMS.bringToFront();
 
 puntosContador = L.layerGroup().addTo(map);
 // ======================
@@ -385,4 +416,3 @@ fetch('https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j
         error
     );
 
-});
