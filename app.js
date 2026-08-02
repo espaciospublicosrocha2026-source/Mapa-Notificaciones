@@ -98,10 +98,10 @@ const ortofotoUrbana = L.tileLayer.wms(
         format:'image/png',
         transparent:false,
         version:'1.1.1',
+        crs:L.CRS.EPSG4326,
         maxZoom:22
     }
 );
-
 
 // CATASTRO / PARCELAS (ENCIMA)
 
