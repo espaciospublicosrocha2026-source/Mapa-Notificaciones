@@ -83,7 +83,7 @@ map = L.map('mapa').setView(
     [-34.48,-54.33],
     13
 );
-
+console.log("MAPA CREADO");
 // ======================
 // CAPAS BASE
 // ======================
@@ -119,7 +119,7 @@ const catastroParcelas = L.tileLayer.wms(
 ortofotoUrbana.addTo(map);
 
 catastroParcelas.addTo(map);
-
+console.log("CAPAS CARGADAS");
 puntosContador = L.layerGroup().addTo(map);
 // ======================
 // FEATURE GROUP
@@ -128,7 +128,7 @@ puntosContador = L.layerGroup().addTo(map);
 drawnItems = new L.FeatureGroup();
 
 map.addLayer(drawnItems);
-
+console.log("DRAW CARGADO");
 // ======================
 // CONTROLES DRAW
 // ======================
