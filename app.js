@@ -4,6 +4,7 @@ let currentColor = 'red';
 let modoContador = false;
 let contador = 0;
 let puntosContador;
+let modoEliminar = false;
 
 // ======================
 // FUNCIONES GLOBALES
@@ -47,6 +48,18 @@ function limpiarContador(){
     contador = 0;
 
     document.getElementById("contadorParcelas").innerHTML = contador;
+
+}
+
+function activarEliminar(){
+
+    modoEliminar = !modoEliminar;
+
+    alert(
+        modoEliminar
+        ? "Modo eliminar activado"
+        : "Modo eliminar desactivado"
+    );
 
 }
 
@@ -226,8 +239,20 @@ L.circleMarker(e.latlng,{
     fill:true,
     fillColor:"#000000",
     fillOpacity:1
-}).addTo(puntosContador);
+});
+    punto.on("click",function(){
 
+    if(!modoEliminar) return;
+
+    puntosContador.removeLayer(punto);
+
+    contador--;
+
+    document.getElementById("contadorParcelas").innerHTML = contador;
+
+});
+
+punto.addTo(puntosContador);
     contador++;
 
     document.getElementById("contadorParcelas").innerHTML = contador;
