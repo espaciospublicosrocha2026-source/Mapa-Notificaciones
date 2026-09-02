@@ -64,10 +64,58 @@ body{
 
 }
 
+#panel button:hover{
+
+    opacity:0.8;
+
+}
+
 #colorActual{
 
     margin-top:10px;
 
     font-weight:bold;
+
+}
+
+#herramientaCirculo{
+
+    margin-bottom:5px;
+
+}
+
+#herramientaCirculo strong{
+
+    display:block;
+
+    margin-bottom:8px;
+
+}
+
+#herramientaCirculo label{
+
+    display:block;
+
+    font-size:13px;
+
+    margin-bottom:5px;
+
+}
+
+#radioCirculo{
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    padding:8px;
+
+    margin-bottom:8px;
+
+    border:1px solid #ccc;
+
+    border-radius:5px;
+
+    font-size:14px;
 
 }
