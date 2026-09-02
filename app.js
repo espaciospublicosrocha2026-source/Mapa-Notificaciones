@@ -1,3 +1,4 @@
+alert('ESTOY CARGANDO EL APP.JS NUEVO');
 const URL = 'https://script.google.com/macros/s/AKfycbxmiKNXuRFGrJxAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec';
 
 let map;
