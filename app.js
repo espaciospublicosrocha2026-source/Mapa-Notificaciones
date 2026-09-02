@@ -1,4 +1,3 @@
-alert('ESTOY CARGANDO EL APP.JS NUEVO');
 const URL = 'https://script.google.com/macros/s/AKfycbxmiKNXuRFGrJxAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec';
 
 let map;
@@ -81,11 +80,13 @@ const drawControl = new L.Control.Draw({
         marker: false,
 
         circlemarker: false
+
     },
 
     edit: {
 
         featureGroup: drawnItems
+
     }
 
 });
@@ -105,6 +106,7 @@ function setColor(color) {
         'colorActual'
     ).innerHTML =
         'Color actual: ' + color;
+
 }
 
 
@@ -118,23 +120,31 @@ map.on(
 
         const layer = event.layer;
 
-        // Guardamos el color
+
+        // Guardar color
         layer.options.colorGuardado =
             currentColor;
 
-        // Aplicamos color
-        layer.setStyle({
 
-            color: currentColor,
+        // Aplicar color
+        if (layer.setStyle) {
 
-            fillColor: currentColor
+            layer.setStyle({
 
-        });
+                color: currentColor,
 
-        // Agregamos al grupo
+                fillColor: currentColor
+
+            });
+
+        }
+
+
+        // Agregar dibujo
         drawnItems.addLayer(layer);
 
-        // Guardamos SOLO dibujos
+
+        // Guardar dibujos
         guardarGeoJSON();
 
     }
@@ -149,10 +159,8 @@ map.on(
     L.Draw.Event.EDITED,
     function() {
 
-        // Guardar dibujos
         guardarGeoJSON();
 
-        // Guardar círculos
         guardarCirculos();
 
     }
@@ -167,10 +175,8 @@ map.on(
     L.Draw.Event.DELETED,
     function() {
 
-        // Guardar dibujos
         guardarGeoJSON();
 
-        // Guardar círculos
         guardarCirculos();
 
     }
@@ -195,8 +201,8 @@ function guardarGeoJSON() {
     drawnItems.eachLayer(
         function(layer) {
 
-            // IMPORTANTE:
-            // Los círculos NO van a dibujos.geojson
+            // Los círculos no se guardan
+            // en dibujos.geojson
 
             if (
                 layer instanceof L.Circle
@@ -216,11 +222,8 @@ function guardarGeoJSON() {
 
 
             feature.properties.color =
-
                 layer.options.colorGuardado ||
-
                 layer.options.color ||
-
                 currentColor;
 
 
@@ -244,6 +247,8 @@ function guardarGeoJSON() {
 
             method: 'POST',
 
+            mode: 'no-cors',
+
             headers: {
 
                 'Content-Type':
@@ -258,19 +263,10 @@ function guardarGeoJSON() {
     )
 
     .then(
-        function(response) {
-
-            return response.text();
-
-        }
-    )
-
-    .then(
-        function(data) {
+        function() {
 
             console.log(
-                'RESPUESTA DIBUJOS:',
-                data
+                'SOLICITUD DE DIBUJOS ENVIADA'
             );
 
         }
@@ -280,7 +276,7 @@ function guardarGeoJSON() {
         function(error) {
 
             console.error(
-                'ERROR GUARDANDO DIBUJOS:',
+                'ERROR ENVIANDO DIBUJOS:',
                 error
             );
 
@@ -308,7 +304,7 @@ function guardarCirculos() {
     drawnItems.eachLayer(
         function(layer) {
 
-            // Ignorar todo lo que NO sea círculo
+            // Ignorar todo lo que no sea círculo
 
             if (
                 !(layer instanceof L.Circle)
@@ -335,11 +331,8 @@ function guardarCirculos() {
                         layer.getRadius(),
 
                     color:
-
                         layer.options.colorGuardado ||
-
                         layer.options.color ||
-
                         'red'
 
                 },
@@ -370,13 +363,7 @@ function guardarCirculos() {
 
 
     // =================================================
-    // MUY IMPORTANTE
-    // EL APPS SCRIPT ACTUAL ESPERA:
-    //
-    // {
-    //    tipo: 'circulos',
-    //    geojson: {...}
-    // }
+    // FORMATO QUE ESPERA EL APPS SCRIPT
     // =================================================
 
     const datos = {
@@ -400,6 +387,8 @@ function guardarCirculos() {
 
             method: 'POST',
 
+            mode: 'no-cors',
+
             headers: {
 
                 'Content-Type':
@@ -414,19 +403,10 @@ function guardarCirculos() {
     )
 
     .then(
-        function(response) {
-
-            return response.text();
-
-        }
-    )
-
-    .then(
-        function(data) {
+        function() {
 
             console.log(
-                'RESPUESTA CÍRCULOS:',
-                data
+                'SOLICITUD DE CÍRCULOS ENVIADA'
             );
 
         }
@@ -436,11 +416,87 @@ function guardarCirculos() {
         function(error) {
 
             console.error(
-                'ERROR GUARDANDO CÍRCULOS:',
+                'ERROR ENVIANDO CÍRCULOS:',
                 error
             );
 
         }
+    );
+
+}
+
+
+// =====================================================
+// JSONP
+// =====================================================
+
+function cargarJSONP(url, callback) {
+
+    const nombreCallback =
+        'jsonp_' +
+        Date.now() +
+        '_' +
+        Math.floor(
+            Math.random() * 100000
+        );
+
+
+    const script =
+        document.createElement(
+            'script'
+        );
+
+
+    window[nombreCallback] =
+        function(data) {
+
+            try {
+
+                callback(data);
+
+            }
+
+            finally {
+
+                delete window[
+                    nombreCallback
+                ];
+
+                script.remove();
+
+            }
+
+        };
+
+
+    script.src =
+        url +
+        (url.includes('?') ? '&' : '?') +
+        'callback=' +
+        nombreCallback;
+
+
+    script.onerror =
+        function() {
+
+            console.error(
+                'ERROR CARGANDO JSONP:',
+                url
+            );
+
+
+            delete window[
+                nombreCallback
+            ];
+
+
+            script.remove();
+
+        };
+
+
+    document.body.appendChild(
+        script
     );
 
 }
@@ -452,130 +508,103 @@ function guardarCirculos() {
 
 function cargarDibujos() {
 
-    fetch(URL)
+    cargarJSONP(
+        URL + '?tipo=dibujos',
+        function(geojson) {
 
-        .then(
-            function(response) {
+            console.log(
+                'DIBUJOS CARGADOS:',
+                geojson
+            );
 
-                if (!response.ok) {
 
-                    throw new Error(
-                        'Error HTTP: ' +
-                        response.status
-                    );
+            if (
+                !geojson ||
+                !geojson.features
+            ) {
+
+                console.warn(
+                    'No se encontraron dibujos.'
+                );
+
+                return;
+
+            }
+
+
+            L.geoJSON(
+
+                geojson,
+
+                {
+
+                    filter:
+                        function(feature) {
+
+                            return !(
+                                feature.properties &&
+                                feature.properties.tipo ===
+                                    'circulo'
+                            );
+
+                        },
+
+
+                    style:
+                        function(feature) {
+
+                            const color =
+                                feature.properties &&
+                                feature.properties.color
+                                    ? feature.properties.color
+                                    : 'red';
+
+
+                            return {
+
+                                color: color,
+
+                                fillColor: color,
+
+                                fillOpacity: 0.2,
+
+                                weight: 3
+
+                            };
+
+                        },
+
+
+                    onEachFeature:
+                        function(
+                            feature,
+                            layer
+                        ) {
+
+                            const color =
+                                feature.properties &&
+                                feature.properties.color
+                                    ? feature.properties.color
+                                    : 'red';
+
+
+                            layer.options
+                                .colorGuardado =
+                                color;
+
+
+                            drawnItems.addLayer(
+                                layer
+                            );
+
+                        }
 
                 }
 
-                return response.json();
+            );
 
-            }
-        )
-
-        .then(
-            function(geojson) {
-
-                console.log(
-                    'DIBUJOS CARGADOS:',
-                    geojson
-                );
-
-
-                L.geoJSON(
-
-                    geojson,
-
-                    {
-
-                        // Por seguridad,
-                        // ignoramos círculos si hubiera
-                        // alguno viejo dentro de dibujos.geojson
-
-                        filter:
-                            function(feature) {
-
-                                return !(
-                                    feature.properties &&
-                                    feature.properties.tipo ===
-                                        'circulo'
-                                );
-
-                            },
-
-
-                        style:
-                            function(feature) {
-
-                                const color =
-
-                                    feature.properties &&
-
-                                    feature.properties.color
-
-                                        ? feature.properties.color
-
-                                        : 'red';
-
-
-                                return {
-
-                                    color: color,
-
-                                    fillColor: color,
-
-                                    fillOpacity: 0.2,
-
-                                    weight: 3
-
-                                };
-
-                            },
-
-
-                        onEachFeature:
-
-                            function(
-                                feature,
-                                layer
-                            ) {
-
-                                const color =
-
-                                    feature.properties &&
-
-                                    feature.properties.color
-
-                                        ? feature.properties.color
-
-                                        : 'red';
-
-
-                                layer.options.colorGuardado =
-                                    color;
-
-
-                                drawnItems.addLayer(
-                                    layer
-                                );
-
-                            }
-
-                    }
-
-                );
-
-            }
-        )
-
-        .catch(
-            function(error) {
-
-                console.error(
-                    'ERROR CARGANDO DIBUJOS:',
-                    error
-                );
-
-            }
-        );
+        }
+    );
 
 }
 
@@ -586,151 +615,109 @@ function cargarDibujos() {
 
 function cargarCirculos() {
 
-    // IMPORTANTE:
-    // El Apps Script actual utiliza ?tipo=circulos
-    // SOLO para cargar.
+    cargarJSONP(
+        URL + '?tipo=circulos',
+        function(geojson) {
 
-    fetch(
-        URL + '?tipo=circulos'
-    )
+            console.log(
+                'CÍRCULOS CARGADOS:',
+                geojson
+            );
 
-        .then(
-            function(response) {
 
-                if (!response.ok) {
+            if (
+                !geojson ||
+                !geojson.features
+            ) {
 
-                    throw new Error(
-                        'Error HTTP: ' +
-                        response.status
+                console.warn(
+                    'No se encontraron círculos.'
+                );
+
+                return;
+
+            }
+
+
+            geojson.features.forEach(
+
+                function(feature) {
+
+                    if (
+                        !feature.geometry ||
+                        feature.geometry.type !==
+                            'Point'
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const coordenadas =
+                        feature.geometry.coordinates;
+
+
+                    const lng =
+                        coordenadas[0];
+
+
+                    const lat =
+                        coordenadas[1];
+
+
+                    const propiedades =
+                        feature.properties || {};
+
+
+                    const radio =
+                        Number(
+                            propiedades.radio
+                        ) || 100;
+
+
+                    const color =
+                        propiedades.color ||
+                        'red';
+
+
+                    const circulo =
+                        L.circle(
+
+                            [lat, lng],
+
+                            {
+
+                                radius: radio,
+
+                                color: color,
+
+                                fillColor: color,
+
+                                fillOpacity: 0.2,
+
+                                weight: 3
+
+                            }
+
+                        );
+
+
+                    circulo.options
+                        .colorGuardado =
+                        color;
+
+
+                    drawnItems.addLayer(
+                        circulo
                     );
 
                 }
 
-                return response.json();
+            );
 
-            }
-        )
-
-        .then(
-            function(geojson) {
-
-                console.log(
-                    'CÍRCULOS CARGADOS:',
-                    geojson
-                );
-
-
-                if (
-                    !geojson ||
-                    !geojson.features
-                ) {
-
-                    return;
-
-                }
-
-
-                geojson.features.forEach(
-
-                    function(feature) {
-
-                        // Verificamos que sea un punto
-
-                        if (
-                            !feature.geometry ||
-                            feature.geometry.type !==
-                                'Point'
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        const coordenadas =
-                            feature.geometry.coordinates;
-
-
-                        const lng =
-                            coordenadas[0];
-
-
-                        const lat =
-                            coordenadas[1];
-
-
-                        const propiedades =
-                            feature.properties || {};
-
-
-                        const radio =
-
-                            Number(
-                                propiedades.radio
-                            ) || 100;
-
-
-                        const color =
-
-                            propiedades.color ||
-
-                            'red';
-
-
-                        // Crear círculo
-
-                        const circulo =
-
-                            L.circle(
-
-                                [lat, lng],
-
-                                {
-
-                                    radius: radio,
-
-                                    color: color,
-
-                                    fillColor: color,
-
-                                    fillOpacity: 0.2,
-
-                                    weight: 3
-
-                                }
-
-                            );
-
-
-                        // Guardar color
-
-                        circulo.options.colorGuardado =
-                            color;
-
-
-                        // Agregar al grupo editable
-
-                        drawnItems.addLayer(
-                            circulo
-                        );
-
-                    }
-
-                );
-
-            }
-        )
-
-        .catch(
-            function(error) {
-
-                console.error(
-                    'ERROR CARGANDO CÍRCULOS:',
-                    error
-                );
-
-            }
-        );
+        }
+    );
 
 }
 
@@ -746,8 +733,6 @@ function activarCirculo() {
 
 
     if (modoCirculo) {
-
-        // Desactivar otros modos
 
         modoContador = false;
 
@@ -793,27 +778,19 @@ map.on(
                 function(layer) {
 
                     const distancia =
-
                         map.distance(
-
                             e.latlng,
-
                             layer.getLatLng()
-
                         );
 
 
                     if (
-
                         distancia <= 20 &&
-
                         !eliminado
-
                     ) {
 
-                        puntosContador.removeLayer(
-                            layer
-                        );
+                        puntosContador
+                            .removeLayer(layer);
 
 
                         contador--;
@@ -855,7 +832,6 @@ map.on(
 
 
             const punto =
-
                 L.circleMarker(
 
                     e.latlng,
@@ -901,14 +877,12 @@ map.on(
         if (modoCirculo) {
 
             const input =
-
                 document.getElementById(
                     'radioCirculo'
                 );
 
 
             const radio =
-
                 Number(
                     input.value
                 );
@@ -931,7 +905,6 @@ map.on(
             // Crear círculo
 
             const circulo =
-
                 L.circle(
 
                     e.latlng,
@@ -955,7 +928,8 @@ map.on(
 
             // Guardar color
 
-            circulo.options.colorGuardado =
+            circulo.options
+                .colorGuardado =
                 currentColor;
 
 
@@ -966,12 +940,18 @@ map.on(
             );
 
 
+            console.log(
+                'CÍRCULO CREADO:',
+                circulo
+            );
+
+
             // Guardar SOLO círculos
 
             guardarCirculos();
 
 
-            // Desactivar modo círculo
+            // Desactivar modo
 
             modoCirculo = false;
 
@@ -1057,7 +1037,7 @@ function limpiarContador() {
 
 
 // =====================================================
-// LIMPIAR TODOS LOS DIBUJOS
+// LIMPIAR DIBUJOS Y CÍRCULOS
 // =====================================================
 
 function limpiarDibujos() {
@@ -1089,7 +1069,7 @@ function limpiarDibujos() {
 
 
 // =====================================================
-// HACER FUNCIONES DISPONIBLES PARA HTML
+// FUNCIONES DISPONIBLES PARA HTML
 // =====================================================
 
 window.setColor =
@@ -1112,7 +1092,7 @@ window.activarCirculo =
 
 
 // =====================================================
-// CARGAR INFORMACIÓN AL INICIAR
+// CARGAR AL INICIAR
 // =====================================================
 
 cargarDibujos();
