@@ -5,6 +5,7 @@ let modoContador = false;
 let contador = 0;
 let puntosContador;
 let modoEliminar = false;
+let modoCirculo = false;
 
 // ======================
 // FUNCIONES GLOBALES
@@ -33,6 +34,13 @@ function activarContador(){
 
     modoContador = !modoContador;
 
+    if(modoContador){
+
+        modoCirculo = false;
+        modoEliminar = false;
+
+    }
+
     alert(
         modoContador
         ? "Modo contador activado"
@@ -56,7 +64,10 @@ function activarEliminar(){
     modoEliminar = !modoEliminar;
 
     if(modoEliminar){
+
         modoContador = false;
+        modoCirculo = false;
+
     }
 
     alert(
@@ -67,6 +78,33 @@ function activarEliminar(){
 
 }
 
+// ======================
+// ACTIVAR CÍRCULO
+// ======================
+
+function activarCirculo(){
+
+    modoCirculo = !modoCirculo;
+
+    if(modoCirculo){
+
+        modoContador = false;
+        modoEliminar = false;
+
+        alert(
+            "Modo círculo activado. Hacé clic en el mapa para colocar el centro."
+        );
+
+    }else{
+
+        alert(
+            "Modo círculo desactivado"
+        );
+
+    }
+
+}
+
 // HACER GLOBALES
 
 window.setColor = setColor;
@@ -74,6 +112,7 @@ window.limpiarDibujos = limpiarDibujos;
 window.activarContador = activarContador;
 window.limpiarContador = limpiarContador;
 window.activarEliminar = activarEliminar;
+window.activarCirculo = activarCirculo;
 
 // ======================
 // INICIAR MAPA
@@ -83,7 +122,9 @@ map = L.map('mapa').setView(
     [-34.48,-54.33],
     13
 );
+
 console.log("MAPA CREADO");
+
 // ======================
 // CAPAS BASE
 // ======================
@@ -111,7 +152,6 @@ const catastroParcelas = L.tileLayer.wms(
     }
 );
 
-
 // ======================
 // CARGAR CAPAS
 // ======================
@@ -119,8 +159,11 @@ const catastroParcelas = L.tileLayer.wms(
 ortofotoUrbana.addTo(map);
 
 catastroParcelas.addTo(map);
+
 console.log("CAPAS CARGADAS");
+
 puntosContador = L.layerGroup().addTo(map);
+
 // ======================
 // FEATURE GROUP
 // ======================
@@ -128,7 +171,9 @@ puntosContador = L.layerGroup().addTo(map);
 drawnItems = new L.FeatureGroup();
 
 map.addLayer(drawnItems);
+
 console.log("DRAW CARGADO");
+
 // ======================
 // CONTROLES DRAW
 // ======================
@@ -157,6 +202,7 @@ map.addControl(drawControl);
 // ======================
 // CREAR DIBUJOS
 // ======================
+
 map.on(L.Draw.Event.CREATED,function(e){
 
     const layer = e.layer;
@@ -187,6 +233,17 @@ map.on(L.Draw.Event.CREATED,function(e){
 
 map.on(L.Draw.Event.EDITED,function(){
 
+    drawnItems.eachLayer(function(layer){
+
+        if(layer instanceof L.Circle){
+
+            layer.options.radioGuardado =
+            layer.getRadius();
+
+        }
+
+    });
+
     guardarGeoJSON();
 
 });
@@ -201,8 +258,77 @@ map.on(L.Draw.Event.DELETED,function(){
 
 });
 
+// ======================
+// CLICK EN MAPA
+// ======================
+
 map.on("click", function(e){
 
+    // ======================
+    // CREAR CÍRCULO
+    // ======================
+
+    if(modoCirculo){
+
+        const radioInput =
+        document.getElementById(
+            "radioCirculo"
+        );
+
+        const radio =
+        Number(radioInput.value);
+
+        if(!radio || radio <= 0){
+
+            alert(
+                "Ingresá un radio válido en metros."
+            );
+
+            return;
+
+        }
+
+        const circulo =
+        L.circle(
+            e.latlng,
+            {
+
+                radius:radio,
+
+                color:currentColor,
+
+                fillColor:currentColor,
+
+                fillOpacity:0.25,
+
+                weight:3
+
+            }
+        );
+
+        // GUARDAR COLOR
+
+        circulo.options.colorGuardado =
+        currentColor;
+
+        // GUARDAR RADIO
+
+        circulo.options.radioGuardado =
+        radio;
+
+        drawnItems.addLayer(
+            circulo
+        );
+
+        guardarGeoJSON();
+
+        // Desactivar herramienta
+
+        modoCirculo = false;
+
+        return;
+
+    }
 
     // ======================
     // ELIMINAR PUNTO
@@ -220,6 +346,7 @@ map.on("click", function(e){
             );
 
             // distancia en metros
+
             if(distancia < 20 && !eliminado){
 
                 puntosContador.removeLayer(layer);
@@ -231,6 +358,7 @@ map.on("click", function(e){
                 ).innerHTML = contador;
 
                 eliminado = true;
+
             }
 
         });
@@ -239,27 +367,24 @@ map.on("click", function(e){
 
     }
 
-
-
     // ======================
     // CREAR PUNTO
     // ======================
 
     if(!modoContador) return;
 
-
     const punto = L.circleMarker(e.latlng,{
+
         radius:15,
         stroke:true,
         color:"#000000",
         weight:3,
         fillColor:"#000000",
         fillOpacity:1
+
     });
 
-
     punto.addTo(puntosContador);
-
 
     contador++;
 
@@ -267,11 +392,12 @@ map.on("click", function(e){
         "contadorParcelas"
     ).innerHTML = contador;
 
-
 });
+
 // ======================
 // GUARDAR EN GOOGLE DRIVE
 // ======================
+
 function guardarGeoJSON(){
 
     const geojson =
@@ -288,10 +414,24 @@ function guardarGeoJSON(){
         feature.properties.color =
         layer.options.colorGuardado || 'red';
 
+        // ======================
+        // GUARDAR RADIO CÍRCULO
+        // ======================
+
+        if(layer instanceof L.Circle){
+
+            feature.properties.tipo =
+            "circulo";
+
+            feature.properties.radio =
+            layer.getRadius();
+
+        }
+
     });
 
     fetch(
-        'https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec',
+        'https://script.google.com/macros/s/AKfycbxmiKNXuRFGrJxAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec',
         {
 
             method:'POST',
@@ -328,7 +468,9 @@ function guardarGeoJSON(){
 // CARGAR DIBUJOS
 // ======================
 
-fetch('https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec')
+fetch(
+    'https://script.google.com/macros/s/AKfycbxmiKNXuRFGrJxAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec'
+)
 
 .then(res => res.json())
 
@@ -362,7 +504,70 @@ fetch('https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j
             layer
         ){
 
-            // RECUPERAR COLOR ORIGINAL
+            // ======================
+            // CÍRCULO
+            // ======================
+
+            if(
+                feature.properties &&
+                feature.properties.tipo === "circulo"
+            ){
+
+                const radio =
+                Number(
+                    feature.properties.radio
+                );
+
+                if(radio > 0){
+
+                    const centro =
+                    layer.getBounds().getCenter();
+
+                    const circulo =
+                    L.circle(
+                        centro,
+                        {
+
+                            radius:radio,
+
+                            color:
+                            feature.properties.color
+                            ||
+                            'red',
+
+                            fillColor:
+                            feature.properties.color
+                            ||
+                            'red',
+
+                            fillOpacity:0.5,
+
+                            weight:3
+
+                        }
+                    );
+
+                    circulo.options.colorGuardado =
+                    feature.properties.color
+                    ||
+                    'red';
+
+                    circulo.options.radioGuardado =
+                    radio;
+
+                    drawnItems.addLayer(
+                        circulo
+                    );
+
+                    return;
+
+                }
+
+            }
+
+            // ======================
+            // DIBUJOS NORMALES
+            // ======================
 
             layer.options.colorGuardado =
             feature.properties.color || 'red';
@@ -383,4 +588,5 @@ fetch('https://script.google.com/macros/s/AKfycbxmiKNXuRFGrjAxxiigZAxvMb4r8_Ld8j
     );
 
 });
+
 console.log("APP TERMINO DE CARGAR");
