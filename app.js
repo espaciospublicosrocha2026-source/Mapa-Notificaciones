@@ -1,4 +1,4 @@
-const URL = 'https://script.google.com/macros/s/AKfycbzloZbxOSaxqtliz4PqIC4hnm7nA8DrFJMMlSF2MSS0njN2-AISFQ-94Bn-xIt7CcFOWQ/exec';
+const URL = 'https://script.google.com/macros/s/AKfycbxRj7NDpgw7fIdOumtvR6c_OYDztMC53tTR7pjoKCxj90Lf7KjlG0QvIahWpp5MoHYigg/exec';
 
 let map;
 let drawnItems;
