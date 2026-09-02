@@ -55,7 +55,9 @@ function limpiarContador(){
 
     contador = 0;
 
-    document.getElementById("contadorParcelas").innerHTML = contador;
+    document.getElementById(
+        "contadorParcelas"
+    ).innerHTML = contador;
 
 }
 
@@ -114,6 +116,7 @@ window.limpiarContador = limpiarContador;
 window.activarEliminar = activarEliminar;
 window.activarCirculo = activarCirculo;
 
+
 // ======================
 // INICIAR MAPA
 // ======================
@@ -124,6 +127,7 @@ map = L.map('mapa').setView(
 );
 
 console.log("MAPA CREADO");
+
 
 // ======================
 // CAPAS BASE
@@ -152,6 +156,7 @@ const catastroParcelas = L.tileLayer.wms(
     }
 );
 
+
 // ======================
 // CARGAR CAPAS
 // ======================
@@ -164,6 +169,7 @@ console.log("CAPAS CARGADAS");
 
 puntosContador = L.layerGroup().addTo(map);
 
+
 // ======================
 // FEATURE GROUP
 // ======================
@@ -173,6 +179,7 @@ drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
 console.log("DRAW CARGADO");
+
 
 // ======================
 // CONTROLES DRAW
@@ -198,6 +205,7 @@ const drawControl = new L.Control.Draw({
 });
 
 map.addControl(drawControl);
+
 
 // ======================
 // CREAR DIBUJOS
@@ -227,6 +235,7 @@ map.on(L.Draw.Event.CREATED,function(e){
 
 });
 
+
 // ======================
 // EDITAR
 // ======================
@@ -248,6 +257,7 @@ map.on(L.Draw.Event.EDITED,function(){
 
 });
 
+
 // ======================
 // BORRAR
 // ======================
@@ -258,11 +268,13 @@ map.on(L.Draw.Event.DELETED,function(){
 
 });
 
+
 // ======================
 // CLICK EN MAPA
 // ======================
 
 map.on("click", function(e){
+
 
     // ======================
     // CREAR CÍRCULO
@@ -278,6 +290,7 @@ map.on("click", function(e){
         const radio =
         Number(radioInput.value);
 
+
         if(!radio || radio <= 0){
 
             alert(
@@ -287,6 +300,7 @@ map.on("click", function(e){
             return;
 
         }
+
 
         const circulo =
         L.circle(
@@ -306,29 +320,36 @@ map.on("click", function(e){
             }
         );
 
+
         // GUARDAR COLOR
 
         circulo.options.colorGuardado =
         currentColor;
+
 
         // GUARDAR RADIO
 
         circulo.options.radioGuardado =
         radio;
 
+
         drawnItems.addLayer(
             circulo
         );
 
+
         guardarGeoJSON();
 
-        // Desactivar herramienta
+
+        // Desactivar modo círculo
 
         modoCirculo = false;
+
 
         return;
 
     }
+
 
     // ======================
     // ELIMINAR PUNTO
@@ -367,11 +388,13 @@ map.on("click", function(e){
 
     }
 
+
     // ======================
     // CREAR PUNTO
     // ======================
 
     if(!modoContador) return;
+
 
     const punto = L.circleMarker(e.latlng,{
 
@@ -384,15 +407,19 @@ map.on("click", function(e){
 
     });
 
+
     punto.addTo(puntosContador);
 
+
     contador++;
+
 
     document.getElementById(
         "contadorParcelas"
     ).innerHTML = contador;
 
 });
+
 
 // ======================
 // GUARDAR EN GOOGLE DRIVE
@@ -403,19 +430,31 @@ function guardarGeoJSON(){
     const geojson =
     drawnItems.toGeoJSON();
 
+
     geojson.features.forEach(function(feature,index){
 
         const layer =
         drawnItems.getLayers()[index];
 
+
         feature.properties =
         feature.properties || {};
 
-        feature.properties.color =
-        layer.options.colorGuardado || 'red';
 
         // ======================
-        // GUARDAR RADIO CÍRCULO
+        // COLOR
+        // ======================
+
+        feature.properties.color =
+        layer.options.colorGuardado
+        ||
+        layer.options.color
+        ||
+        'red';
+
+
+        // ======================
+        // CÍRCULO
         // ======================
 
         if(layer instanceof L.Circle){
@@ -423,12 +462,14 @@ function guardarGeoJSON(){
             feature.properties.tipo =
             "circulo";
 
+
             feature.properties.radio =
             layer.getRadius();
 
         }
 
     });
+
 
     fetch(
         'https://script.google.com/macros/s/AKfycbxmiKNXuRFGrJxAxxiigZAxvMb4r8_Ld8j_iX5Zx5RPDGxdxltLLsWYgW-I6qi-tpMWbVw/exec',
@@ -440,7 +481,9 @@ function guardarGeoJSON(){
                 'Content-Type':'text/plain'
             },
 
-            body:JSON.stringify(geojson)
+            body:JSON.stringify(
+                geojson
+            )
 
         }
     )
@@ -464,6 +507,7 @@ function guardarGeoJSON(){
 
 }
 
+
 // ======================
 // CARGAR DIBUJOS
 // ======================
@@ -476,105 +520,158 @@ fetch(
 
 .then(data => {
 
-    const capa = L.geoJSON(data,{
 
-        style:function(feature){
+    // ======================
+    // RECORRER CADA DIBUJO
+    // ======================
 
-            return{
+    data.features.forEach(function(feature){
 
-                color:
-                feature.properties.color
-                ||
-                'red',
+        const propiedades =
+        feature.properties || {};
 
-                fillColor:
-                feature.properties.color
-                ||
-                'red',
 
-                fillOpacity:0.5,
-                weight:3
+        // ======================
+        // CÍRCULO
+        // ======================
 
-            };
-
-        },
-
-        onEachFeature:function(
-            feature,
-            layer
+        if(
+            propiedades.tipo === "circulo"
+            &&
+            propiedades.radio
+            &&
+            feature.geometry
+            &&
+            feature.geometry.coordinates
         ){
 
-            // ======================
-            // CÍRCULO
-            // ======================
+            const coordenadas =
+            feature.geometry.coordinates;
+
+
+            const lat =
+            coordenadas[1];
+
+
+            const lng =
+            coordenadas[0];
+
+
+            const radio =
+            Number(
+                propiedades.radio
+            );
+
 
             if(
-                feature.properties &&
-                feature.properties.tipo === "circulo"
+                !isNaN(lat)
+                &&
+                !isNaN(lng)
+                &&
+                radio > 0
             ){
 
-                const radio =
-                Number(
-                    feature.properties.radio
+                const circulo =
+                L.circle(
+                    [lat,lng],
+                    {
+
+                        radius:radio,
+
+                        color:
+                        propiedades.color
+                        ||
+                        'red',
+
+                        fillColor:
+                        propiedades.color
+                        ||
+                        'red',
+
+                        fillOpacity:0.5,
+
+                        weight:3
+
+                    }
                 );
 
-                if(radio > 0){
 
-                    const centro =
-                    layer.getBounds().getCenter();
+                circulo.options.colorGuardado =
+                propiedades.color
+                ||
+                'red';
 
-                    const circulo =
-                    L.circle(
-                        centro,
-                        {
 
-                            radius:radio,
+                circulo.options.radioGuardado =
+                radio;
 
-                            color:
-                            feature.properties.color
-                            ||
-                            'red',
 
-                            fillColor:
-                            feature.properties.color
-                            ||
-                            'red',
+                drawnItems.addLayer(
+                    circulo
+                );
 
-                            fillOpacity:0.5,
+            }
 
-                            weight:3
 
-                        }
-                    );
+            return;
 
-                    circulo.options.colorGuardado =
+        }
+
+
+        // ======================
+        // DIBUJOS NORMALES
+        // ======================
+
+        const capa =
+        L.geoJSON(
+            feature,
+            {
+
+                style:function(feature){
+
+                    const color =
+                    feature.properties
+                    &&
                     feature.properties.color
                     ||
                     'red';
 
-                    circulo.options.radioGuardado =
-                    radio;
+
+                    return{
+
+                        color:color,
+
+                        fillColor:color,
+
+                        fillOpacity:0.5,
+
+                        weight:3
+
+                    };
+
+                },
+
+                onEachFeature:function(
+                    feature,
+                    layer
+                ){
+
+                    layer.options.colorGuardado =
+                    feature.properties
+                    &&
+                    feature.properties.color
+                    ||
+                    'red';
+
 
                     drawnItems.addLayer(
-                        circulo
+                        layer
                     );
-
-                    return;
 
                 }
 
             }
-
-            // ======================
-            // DIBUJOS NORMALES
-            // ======================
-
-            layer.options.colorGuardado =
-            feature.properties.color || 'red';
-
-            drawnItems.addLayer(layer);
-
-        }
+        );
 
     });
 
@@ -589,4 +686,7 @@ fetch(
 
 });
 
-console.log("APP TERMINO DE CARGAR");
+
+console.log(
+    "APP TERMINO DE CARGAR"
+);
