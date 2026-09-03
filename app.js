@@ -1,4 +1,5 @@
-const URL = 'https://script.google.com/macros/s/AKfycbxRj7NDpgw7fIdOumtvR6c_OYDztMC53tTR7pjoKCxj90Lf7KjlG0QvIahWpp5MoHYigg/exec';
+const URL = 'https://script.google.com/macros/s/AKfycbw2SXmohpdMj2LHgWGq-LFEIjjkA1JezHLPDW2BW-GJyO352iWGZTnTh1rE3EFT_bwnXw/exec';
+
 
 let map;
 let drawnItems;
@@ -30,7 +31,8 @@ map = L.map('mapa').setView(
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution:
+            '&copy; OpenStreetMap contributors'
     }
 ).addTo(map);
 
@@ -42,10 +44,17 @@ L.tileLayer(
 L.tileLayer.wms(
     'https://sig.rocha.gub.uy/geoserver226/wms',
     {
-        layers: 'sigRocha:ortofoto_urbana',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.7
+        layers:
+            'sigRocha:ortofoto_urbana',
+
+        format:
+            'image/png',
+
+        transparent:
+            true,
+
+        opacity:
+            0.7
     }
 ).addTo(map);
 
@@ -54,44 +63,59 @@ L.tileLayer.wms(
 // GRUPO DE DIBUJOS
 // =====================================================
 
-drawnItems = new L.FeatureGroup();
+drawnItems =
+    new L.FeatureGroup();
 
-map.addLayer(drawnItems);
+map.addLayer(
+    drawnItems
+);
 
 
 // =====================================================
-// HERRAMIENTA LEAFLET DRAW
+// LEAFLET DRAW
 // =====================================================
 
-const drawControl = new L.Control.Draw({
+const drawControl =
+    new L.Control.Draw({
 
-    position: 'topleft',
+        position:
+            'topleft',
 
-    draw: {
+        draw: {
 
-        polygon: true,
+            polygon:
+                true,
 
-        polyline: true,
+            polyline:
+                true,
 
-        rectangle: true,
+            rectangle:
+                true,
 
-        circle: false,
+            circle:
+                false,
 
-        marker: false,
+            marker:
+                false,
 
-        circlemarker: false
+            circlemarker:
+                false
 
-    },
+        },
 
-    edit: {
+        edit: {
 
-        featureGroup: drawnItems
+            featureGroup:
+                drawnItems
 
-    }
+        }
 
-});
+    });
 
-map.addControl(drawControl);
+
+map.addControl(
+    drawControl
+);
 
 
 // =====================================================
@@ -100,51 +124,64 @@ map.addControl(drawControl);
 
 function setColor(color) {
 
-    currentColor = color;
+    currentColor =
+        color;
 
-    document.getElementById(
-        'colorActual'
-    ).innerHTML =
-        'Color actual: ' + color;
+
+    const elemento =
+        document.getElementById(
+            'colorActual'
+        );
+
+
+    if (elemento) {
+
+        elemento.innerHTML =
+            'Color actual: ' +
+            color;
+
+    }
 
 }
 
 
 // =====================================================
-// CREACIÓN DE DIBUJOS NORMALES
+// CREAR DIBUJO NORMAL
 // =====================================================
 
 map.on(
     L.Draw.Event.CREATED,
     function(event) {
 
-        const layer = event.layer;
+        const layer =
+            event.layer;
 
 
-        // Guardar color
-        layer.options.colorGuardado =
+        layer.options
+            .colorGuardado =
             currentColor;
 
 
-        // Aplicar color
         if (layer.setStyle) {
 
             layer.setStyle({
 
-                color: currentColor,
+                color:
+                    currentColor,
 
-                fillColor: currentColor
+                fillColor:
+                    currentColor
 
             });
 
         }
 
 
-        // Agregar dibujo
-        drawnItems.addLayer(layer);
+        drawnItems.addLayer(
+            layer
+        );
 
 
-        // Guardar dibujos
         guardarGeoJSON();
 
     }
@@ -152,7 +189,7 @@ map.on(
 
 
 // =====================================================
-// EDICIÓN
+// EDITAR
 // =====================================================
 
 map.on(
@@ -168,7 +205,7 @@ map.on(
 
 
 // =====================================================
-// ELIMINACIÓN
+// ELIMINAR
 // =====================================================
 
 map.on(
@@ -191,9 +228,11 @@ function guardarGeoJSON() {
 
     const geojson = {
 
-        type: 'FeatureCollection',
+        type:
+            'FeatureCollection',
 
-        features: []
+        features:
+            []
 
     };
 
@@ -201,8 +240,7 @@ function guardarGeoJSON() {
     drawnItems.eachLayer(
         function(layer) {
 
-            // Los círculos no se guardan
-            // en dibujos.geojson
+            // Los círculos van a otro archivo
 
             if (
                 layer instanceof L.Circle
@@ -218,12 +256,17 @@ function guardarGeoJSON() {
 
 
             feature.properties =
-                feature.properties || {};
+                feature.properties ||
+                {};
 
 
             feature.properties.color =
-                layer.options.colorGuardado ||
+
+                layer.options
+                    .colorGuardado ||
+
                 layer.options.color ||
+
                 currentColor;
 
 
@@ -245,9 +288,11 @@ function guardarGeoJSON() {
         URL,
         {
 
-            method: 'POST',
+            method:
+                'POST',
 
-            mode: 'no-cors',
+            mode:
+                'no-cors',
 
             headers: {
 
@@ -257,26 +302,30 @@ function guardarGeoJSON() {
             },
 
             body:
-                JSON.stringify(geojson)
+                JSON.stringify(
+                    geojson
+                )
 
         }
+
     )
 
     .then(
         function() {
 
             console.log(
-                'SOLICITUD DE DIBUJOS ENVIADA'
+                'DIBUJOS ENVIADOS'
             );
 
         }
+
     )
 
     .catch(
         function(error) {
 
             console.error(
-                'ERROR ENVIANDO DIBUJOS:',
+                'ERROR GUARDANDO DIBUJOS:',
                 error
             );
 
@@ -294,17 +343,17 @@ function guardarCirculos() {
 
     const geojson = {
 
-        type: 'FeatureCollection',
+        type:
+            'FeatureCollection',
 
-        features: []
+        features:
+            []
 
     };
 
 
     drawnItems.eachLayer(
         function(layer) {
-
-            // Ignorar todo lo que no sea círculo
 
             if (
                 !(layer instanceof L.Circle)
@@ -321,25 +370,32 @@ function guardarCirculos() {
 
             const feature = {
 
-                type: 'Feature',
+                type:
+                    'Feature',
 
                 properties: {
 
-                    tipo: 'circulo',
+                    tipo:
+                        'circulo',
 
                     radio:
                         layer.getRadius(),
 
                     color:
-                        layer.options.colorGuardado ||
+
+                        layer.options
+                            .colorGuardado ||
+
                         layer.options.color ||
+
                         'red'
 
                 },
 
                 geometry: {
 
-                    type: 'Point',
+                    type:
+                        'Point',
 
                     coordinates: [
 
@@ -362,15 +418,13 @@ function guardarCirculos() {
     );
 
 
-    // =================================================
-    // FORMATO QUE ESPERA EL APPS SCRIPT
-    // =================================================
-
     const datos = {
 
-        tipo: 'circulos',
+        tipo:
+            'circulos',
 
-        geojson: geojson
+        geojson:
+            geojson
 
     };
 
@@ -385,9 +439,11 @@ function guardarCirculos() {
         URL,
         {
 
-            method: 'POST',
+            method:
+                'POST',
 
-            mode: 'no-cors',
+            mode:
+                'no-cors',
 
             headers: {
 
@@ -397,26 +453,30 @@ function guardarCirculos() {
             },
 
             body:
-                JSON.stringify(datos)
+                JSON.stringify(
+                    datos
+                )
 
         }
+
     )
 
     .then(
         function() {
 
             console.log(
-                'SOLICITUD DE CÍRCULOS ENVIADA'
+                'CÍRCULOS ENVIADOS'
             );
 
         }
+
     )
 
     .catch(
         function(error) {
 
             console.error(
-                'ERROR ENVIANDO CÍRCULOS:',
+                'ERROR GUARDANDO CÍRCULOS:',
                 error
             );
 
@@ -427,13 +487,16 @@ function guardarCirculos() {
 
 
 // =====================================================
-// JSONP
+// JSONP CON REINTENTOS
 // =====================================================
 
-function cargarJSONP(url, callback) {
+function cargarDatosConReintentos(
+    intentosRestantes,
+    callback
+) {
 
     const nombreCallback =
-        'jsonp_' +
+        'mapaCallback_' +
         Date.now() +
         '_' +
         Math.floor(
@@ -447,50 +510,126 @@ function cargarJSONP(url, callback) {
         );
 
 
-    window[nombreCallback] =
-        function(data) {
-
-            try {
-
-                callback(data);
-
-            }
-
-            finally {
-
-                delete window[
-                    nombreCallback
-                ];
-
-                script.remove();
-
-            }
-
-        };
+    let terminado =
+        false;
 
 
-    script.src =
-        url +
-        (url.includes('?') ? '&' : '?') +
-        'callback=' +
-        nombreCallback;
+    function limpiar() {
+
+        if (script.parentNode) {
+
+            script.parentNode
+                .removeChild(
+                    script
+                );
+
+        }
 
 
-    script.onerror =
-        function() {
-
-            console.error(
-                'ERROR CARGANDO JSONP:',
-                url
-            );
-
+        try {
 
             delete window[
                 nombreCallback
             ];
 
+        }
 
-            script.remove();
+        catch (e) {}
+
+    }
+
+
+    window[nombreCallback] =
+        function(data) {
+
+            if (terminado) {
+
+                return;
+
+            }
+
+
+            terminado =
+                true;
+
+
+            limpiar();
+
+
+            callback(
+                data
+            );
+
+        };
+
+
+    script.src =
+        URL +
+        '?callback=' +
+        nombreCallback +
+        '&t=' +
+        Date.now();
+
+
+    script.onload =
+        function() {
+
+            console.log(
+                'RESPUESTA DEL SERVIDOR RECIBIDA'
+            );
+
+        };
+
+
+    script.onerror =
+        function() {
+
+            if (terminado) {
+
+                return;
+
+            }
+
+
+            terminado =
+                true;
+
+
+            limpiar();
+
+
+            console.warn(
+                'FALLÓ LA CARGA. ' +
+                'Intentos restantes:',
+                intentosRestantes - 1
+            );
+
+
+            if (
+                intentosRestantes > 1
+            ) {
+
+                setTimeout(
+                    function() {
+
+                        cargarDatosConReintentos(
+                            intentosRestantes - 1,
+                            callback
+                        );
+
+                    },
+                    1200
+                );
+
+            }
+
+            else {
+
+                console.error(
+                    'NO SE PUDIERON CARGAR LOS DATOS'
+                );
+
+            }
 
         };
 
@@ -503,28 +642,30 @@ function cargarJSONP(url, callback) {
 
 
 // =====================================================
-// CARGAR DIBUJOS
+// CARGAR DIBUJOS Y CÍRCULOS
 // =====================================================
 
-function cargarDibujos() {
+function cargarDatos() {
 
-    cargarJSONP(
-        URL + '?tipo=dibujos',
-        function(geojson) {
+    console.log(
+        'CARGANDO DIBUJOS Y CÍRCULOS...'
+    );
+
+
+    cargarDatosConReintentos(
+        3,
+        function(datos) {
 
             console.log(
-                'DIBUJOS CARGADOS:',
-                geojson
+                'DATOS RECIBIDOS:',
+                datos
             );
 
 
-            if (
-                !geojson ||
-                !geojson.features
-            ) {
+            if (!datos) {
 
-                console.warn(
-                    'No se encontraron dibujos.'
+                console.error(
+                    'Respuesta vacía del servidor.'
                 );
 
                 return;
@@ -532,75 +673,40 @@ function cargarDibujos() {
             }
 
 
-            L.geoJSON(
+            // =================================================
+            // DIBUJOS
+            // =================================================
 
-                geojson,
+            if (
+                datos.dibujos &&
+                datos.dibujos.features
+            ) {
 
-                {
+                cargarDibujosDesdeGeoJSON(
+                    datos.dibujos
+                );
 
-                    filter:
-                        function(feature) {
-
-                            return !(
-                                feature.properties &&
-                                feature.properties.tipo ===
-                                    'circulo'
-                            );
-
-                        },
+            }
 
 
-                    style:
-                        function(feature) {
+            // =================================================
+            // CÍRCULOS
+            // =================================================
 
-                            const color =
-                                feature.properties &&
-                                feature.properties.color
-                                    ? feature.properties.color
-                                    : 'red';
+            if (
+                datos.circulos &&
+                datos.circulos.features
+            ) {
 
+                cargarCirculosDesdeGeoJSON(
+                    datos.circulos
+                );
 
-                            return {
-
-                                color: color,
-
-                                fillColor: color,
-
-                                fillOpacity: 0.2,
-
-                                weight: 3
-
-                            };
-
-                        },
+            }
 
 
-                    onEachFeature:
-                        function(
-                            feature,
-                            layer
-                        ) {
-
-                            const color =
-                                feature.properties &&
-                                feature.properties.color
-                                    ? feature.properties.color
-                                    : 'red';
-
-
-                            layer.options
-                                .colorGuardado =
-                                color;
-
-
-                            drawnItems.addLayer(
-                                layer
-                            );
-
-                        }
-
-                }
-
+            console.log(
+                'DIBUJOS Y CÍRCULOS CARGADOS'
             );
 
         }
@@ -610,110 +716,176 @@ function cargarDibujos() {
 
 
 // =====================================================
-// CARGAR CÍRCULOS
+// INSERTAR DIBUJOS EN MAPA
 // =====================================================
 
-function cargarCirculos() {
+function cargarDibujosDesdeGeoJSON(
+    geojson
+) {
 
-    cargarJSONP(
-        URL + '?tipo=circulos',
-        function(geojson) {
+    L.geoJSON(
+        geojson,
+        {
 
-            console.log(
-                'CÍRCULOS CARGADOS:',
-                geojson
-            );
+            filter:
+                function(feature) {
 
+                    return !(
+                        feature.properties &&
+                        feature.properties.tipo ===
+                            'circulo'
+                    );
+
+                },
+
+
+            style:
+                function(feature) {
+
+                    const color =
+
+                        feature.properties &&
+                        feature.properties.color
+
+                            ? feature.properties.color
+
+                            : 'red';
+
+
+                    return {
+
+                        color:
+                            color,
+
+                        fillColor:
+                            color,
+
+                        fillOpacity:
+                            0.2,
+
+                        weight:
+                            3
+
+                    };
+
+                },
+
+
+            onEachFeature:
+                function(
+                    feature,
+                    layer
+                ) {
+
+                    const color =
+
+                        feature.properties &&
+                        feature.properties.color
+
+                            ? feature.properties.color
+
+                            : 'red';
+
+
+                    layer.options
+                        .colorGuardado =
+                        color;
+
+
+                    drawnItems.addLayer(
+                        layer
+                    );
+
+                }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// INSERTAR CÍRCULOS EN MAPA
+// =====================================================
+
+function cargarCirculosDesdeGeoJSON(
+    geojson
+) {
+
+    geojson.features.forEach(
+        function(feature) {
 
             if (
-                !geojson ||
-                !geojson.features
+                !feature.geometry ||
+                feature.geometry.type !==
+                    'Point'
             ) {
-
-                console.warn(
-                    'No se encontraron círculos.'
-                );
 
                 return;
 
             }
 
 
-            geojson.features.forEach(
+            const coordenadas =
+                feature.geometry
+                    .coordinates;
 
-                function(feature) {
 
-                    if (
-                        !feature.geometry ||
-                        feature.geometry.type !==
-                            'Point'
-                    ) {
+            const lng =
+                coordenadas[0];
 
-                        return;
+
+            const lat =
+                coordenadas[1];
+
+
+            const propiedades =
+                feature.properties ||
+                {};
+
+
+            const radio =
+                Number(
+                    propiedades.radio
+                ) || 100;
+
+
+            const color =
+                propiedades.color ||
+                'red';
+
+
+            const circulo =
+                L.circle(
+                    [lat, lng],
+                    {
+
+                        radius:
+                            radio,
+
+                        color:
+                            color,
+
+                        fillColor:
+                            color,
+
+                        fillOpacity:
+                            0.2,
+
+                        weight:
+                            3
 
                     }
+                );
 
 
-                    const coordenadas =
-                        feature.geometry.coordinates;
+            circulo.options
+                .colorGuardado =
+                color;
 
 
-                    const lng =
-                        coordenadas[0];
-
-
-                    const lat =
-                        coordenadas[1];
-
-
-                    const propiedades =
-                        feature.properties || {};
-
-
-                    const radio =
-                        Number(
-                            propiedades.radio
-                        ) || 100;
-
-
-                    const color =
-                        propiedades.color ||
-                        'red';
-
-
-                    const circulo =
-                        L.circle(
-
-                            [lat, lng],
-
-                            {
-
-                                radius: radio,
-
-                                color: color,
-
-                                fillColor: color,
-
-                                fillOpacity: 0.2,
-
-                                weight: 3
-
-                            }
-
-                        );
-
-
-                    circulo.options
-                        .colorGuardado =
-                        color;
-
-
-                    drawnItems.addLayer(
-                        circulo
-                    );
-
-                }
-
+            drawnItems.addLayer(
+                circulo
             );
 
         }
@@ -734,9 +906,11 @@ function activarCirculo() {
 
     if (modoCirculo) {
 
-        modoContador = false;
+        modoContador =
+            false;
 
-        modoEliminar = false;
+        modoEliminar =
+            false;
 
 
         alert(
@@ -749,7 +923,7 @@ function activarCirculo() {
 
 
 // =====================================================
-// CLICK EN EL MAPA
+// CLICK EN MAPA
 // =====================================================
 
 map.on(
@@ -770,11 +944,11 @@ map.on(
             }
 
 
-            let eliminado = false;
+            let eliminado =
+                false;
 
 
             puntosContador.eachLayer(
-
                 function(layer) {
 
                     const distancia =
@@ -790,7 +964,9 @@ map.on(
                     ) {
 
                         puntosContador
-                            .removeLayer(layer);
+                            .removeLayer(
+                                layer
+                            );
 
 
                         contador--;
@@ -802,12 +978,12 @@ map.on(
                             contador;
 
 
-                        eliminado = true;
+                        eliminado =
+                            true;
 
                     }
 
                 }
-
             );
 
 
@@ -833,21 +1009,22 @@ map.on(
 
             const punto =
                 L.circleMarker(
-
                     e.latlng,
-
                     {
 
-                        radius: 6,
+                        radius:
+                            6,
 
-                        color: 'black',
+                        color:
+                            'black',
 
-                        fillColor: 'black',
+                        fillColor:
+                            'black',
 
-                        fillOpacity: 1
+                        fillOpacity:
+                            1
 
                     }
-
                 );
 
 
@@ -902,38 +1079,34 @@ map.on(
             }
 
 
-            // Crear círculo
-
             const circulo =
                 L.circle(
-
                     e.latlng,
-
                     {
 
-                        radius: radio,
+                        radius:
+                            radio,
 
-                        color: currentColor,
+                        color:
+                            currentColor,
 
-                        fillColor: currentColor,
+                        fillColor:
+                            currentColor,
 
-                        fillOpacity: 0.2,
+                        fillOpacity:
+                            0.2,
 
-                        weight: 3
+                        weight:
+                            3
 
                     }
-
                 );
 
-
-            // Guardar color
 
             circulo.options
                 .colorGuardado =
                 currentColor;
 
-
-            // Agregar al grupo
 
             drawnItems.addLayer(
                 circulo
@@ -946,14 +1119,11 @@ map.on(
             );
 
 
-            // Guardar SOLO círculos
-
             guardarCirculos();
 
 
-            // Desactivar modo
-
-            modoCirculo = false;
+            modoCirculo =
+                false;
 
 
             return;
@@ -961,12 +1131,11 @@ map.on(
         }
 
     }
-
 );
 
 
 // =====================================================
-// ACTIVAR CONTADOR
+// CONTADOR
 // =====================================================
 
 function activarContador() {
@@ -975,9 +1144,11 @@ function activarContador() {
         !modoContador;
 
 
-    modoEliminar = false;
+    modoEliminar =
+        false;
 
-    modoCirculo = false;
+    modoCirculo =
+        false;
 
 
     if (modoContador) {
@@ -996,7 +1167,7 @@ function activarContador() {
 
 
 // =====================================================
-// ACTIVAR ELIMINAR
+// ELIMINAR
 // =====================================================
 
 function activarEliminar() {
@@ -1005,9 +1176,11 @@ function activarEliminar() {
         !modoEliminar;
 
 
-    modoContador = false;
+    modoContador =
+        false;
 
-    modoCirculo = false;
+    modoCirculo =
+        false;
 
 }
 
@@ -1018,7 +1191,8 @@ function activarEliminar() {
 
 function limpiarContador() {
 
-    contador = 0;
+    contador =
+        0;
 
 
     document.getElementById(
@@ -1037,7 +1211,7 @@ function limpiarContador() {
 
 
 // =====================================================
-// LIMPIAR DIBUJOS Y CÍRCULOS
+// LIMPIAR TODO
 // =====================================================
 
 function limpiarDibujos() {
@@ -1056,12 +1230,7 @@ function limpiarDibujos() {
     drawnItems.clearLayers();
 
 
-    // Vaciar dibujos.geojson
-
     guardarGeoJSON();
-
-
-    // Vaciar circulos.geojson
 
     guardarCirculos();
 
@@ -1069,7 +1238,7 @@ function limpiarDibujos() {
 
 
 // =====================================================
-// FUNCIONES DISPONIBLES PARA HTML
+// FUNCIONES PARA HTML
 // =====================================================
 
 window.setColor =
@@ -1092,9 +1261,7 @@ window.activarCirculo =
 
 
 // =====================================================
-// CARGAR AL INICIAR
+// INICIAR CARGA
 // =====================================================
 
-cargarDibujos();
-
-cargarCirculos();
+cargarDatos();
